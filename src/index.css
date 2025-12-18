@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply m-0 p-0 box-border;
+  }
+  
+  body {
+    @apply bg-deep-black text-text-primary font-sans antialiased;
+    @apply transition-colors duration-300;
+  }
+
+  /* Light mode */
+  body.light {
+    @apply bg-light-bg text-gray-900;
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-deep-black;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-accent-magenta rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-accent-magenta-hover;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-accent-magenta text-white;
+  }
+
+  /* Smooth scroll */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Button Styles */
+  .btn-primary {
+    @apply bg-accent-magenta hover:bg-accent-magenta-hover text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-accent-magenta/50;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border-2 border-accent-gold text-accent-gold hover:bg-accent-gold hover:text-deep-black font-semibold py-3 px-6 rounded-lg transition-all duration-300;
+  }
+
+  .btn-outline {
+    @apply bg-transparent border-2 border-text-secondary/30 text-text-secondary hover:border-accent-magenta hover:text-accent-magenta font-semibold py-3 px-6 rounded-lg transition-all duration-300;
+  }
+
+  /* Card Styles */
+  .card {
+    @apply bg-card-bg border border-text-secondary/10 rounded-xl p-6 transition-all duration-300 hover:bg-card-bg-hover hover:border-accent-magenta/30 hover:shadow-xl hover:shadow-accent-magenta/10 hover:transform hover:-translate-y-1;
+  }
+
+  /* Section Container */
+  .section {
+    @apply py-20 px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-title {
+    @apply text-4xl md:text-5xl font-bold font-display mb-4 bg-gradient-to-r from-accent-magenta to-accent-gold bg-clip-text text-transparent;
+  }
+
+  .section-subtitle {
+    @apply text-lg md:text-xl text-text-muted mb-12;
+  }
+
+  /* Container */
+  .container-custom {
+    @apply max-w-7xl mx-auto;
+  }
+
+  /* Link Styles */
+  .nav-link {
+    @apply text-text-secondary hover:text-accent-magenta transition-colors duration-300 font-medium relative;
+  }
+
+  .nav-link-active {
+    @apply text-accent-magenta;
+  }
+
+  /* Input Styles */
+  .input {
+    @apply w-full bg-card-bg border border-text-secondary/20 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-accent-magenta focus:ring-2 focus:ring-accent-magenta/20 transition-all duration-300;
+  }
+
+  .textarea {
+    @apply w-full bg-card-bg border border-text-secondary/20 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-accent-magenta focus:ring-2 focus:ring-accent-magenta/20 transition-all duration-300 resize-none;
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-accent-magenta via-accent-magenta-hover to-accent-gold bg-clip-text text-transparent;
+  }
+
+  /* Loading Skeleton */
+  .skeleton {
+    @apply bg-card-bg animate-pulse rounded;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .transform-3d {
+    transform-style: preserve-3d;
+  }
+}

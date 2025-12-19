@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
-import { FiGithub, FiLinkedin, FiMail, FiArrowDown, FiTwitter } from 'react-icons/fi'
+import { FiArrowDown, FiDownload } from 'react-icons/fi'
 import { useSanityData } from '../hooks/useSanityData'
-import { fetchAbout } from '../lib/sanity'
+import { fetchProfile, urlFor } from '../lib/sanity'
 
 const Hero = () => {
-  const { data: aboutData, loading } = useSanityData(fetchAbout)
+  const { data: profileData, loading } = useSanityData(fetchProfile)
 
   // Animation variants
   const containerVariants = {
@@ -97,13 +97,26 @@ const Hero = () => {
             </span>
           </motion.div>
 
+          {/* Profile Image */}
+          {profileData?.profileImage && (
+            <motion.div variants={itemVariants} className="mb-6">
+              <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-accent-magenta/30 shadow-xl">
+                <img 
+                  src={urlFor(profileData.profileImage).width(300).height(300).url()} 
+                  alt={profileData.fullName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </motion.div>
+          )}
+
           {/* Name */}
           <motion.h1
             variants={itemVariants}
             className="text-5xl md:text-7xl lg:text-8xl font-bold font-display mb-4"
           >
             <span className="gradient-text">
-              {loading ? 'Loading...' : aboutData?.name || 'Your Name'}
+              {loading ? 'Loading...' : profileData?.fullName || 'Your Name'}
             </span>
           </motion.h1>
 
@@ -112,7 +125,7 @@ const Hero = () => {
             variants={itemVariants}
             className="text-3xl md:text-5xl lg:text-6xl font-bold text-text-secondary mb-6"
           >
-            {loading ? 'Loading...' : aboutData?.title || 'Full-Stack Developer'}
+            {loading ? 'Loading...' : profileData?.professionalTitle || 'Full-Stack Developer'}
           </motion.h2>
 
           {/* Bio */}
@@ -122,7 +135,7 @@ const Hero = () => {
           >
             {loading 
               ? 'Loading your story...' 
-              : aboutData?.shortBio || 'I build exceptional digital experiences that live on the web. Specialized in creating beautiful, functional, and user-centric applications with modern technologies.'}
+              : profileData?.bio || 'I build exceptional digital experiences that live on the web. Specialized in creating beautiful, functional, and user-centric applications with modern technologies.'}
           </motion.p>
 
           {/* CTA Buttons */}
@@ -146,57 +159,18 @@ const Hero = () => {
             >
               Contact Me
             </motion.button>
-          </motion.div>
-
-          {/* Social Links */}
-          <motion.div
-            variants={itemVariants}
-            className="flex gap-6 justify-center items-center"
-          >
-            {aboutData?.socialLinks?.github && (
+            {profileData?.resumeUrl && (
               <motion.a
-                href={aboutData.socialLinks.github}
+                href={profileData.resumeUrl}
+                download
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 bg-card-bg hover:bg-card-bg-hover border border-text-secondary/20 hover:border-accent-magenta rounded-lg transition-all duration-300 group"
-                whileHover={{ scale: 1.1, y: -5 }}
-                whileTap={{ scale: 0.9 }}
+                className="btn-outline w-full sm:w-auto flex items-center gap-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <FiGithub className="w-6 h-6 text-text-secondary group-hover:text-accent-magenta transition-colors duration-300" />
-              </motion.a>
-            )}
-            {aboutData?.socialLinks?.linkedin && (
-              <motion.a
-                href={aboutData.socialLinks.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 bg-card-bg hover:bg-card-bg-hover border border-text-secondary/20 hover:border-accent-magenta rounded-lg transition-all duration-300 group"
-                whileHover={{ scale: 1.1, y: -5 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <FiLinkedin className="w-6 h-6 text-text-secondary group-hover:text-accent-magenta transition-colors duration-300" />
-              </motion.a>
-            )}
-            {aboutData?.socialLinks?.twitter && (
-              <motion.a
-                href={aboutData.socialLinks.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 bg-card-bg hover:bg-card-bg-hover border border-text-secondary/20 hover:border-accent-magenta rounded-lg transition-all duration-300 group"
-                whileHover={{ scale: 1.1, y: -5 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <FiTwitter className="w-6 h-6 text-text-secondary group-hover:text-accent-magenta transition-colors duration-300" />
-              </motion.a>
-            )}
-            {aboutData?.socialLinks?.email && (
-              <motion.a
-                href={`mailto:${aboutData.socialLinks.email}`}
-                className="p-3 bg-card-bg hover:bg-card-bg-hover border border-text-secondary/20 hover:border-accent-magenta rounded-lg transition-all duration-300 group"
-                whileHover={{ scale: 1.1, y: -5 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <FiMail className="w-6 h-6 text-text-secondary group-hover:text-accent-magenta transition-colors duration-300" />
+                <FiDownload className="w-4 h-4" />
+                Resume
               </motion.a>
             )}
           </motion.div>
@@ -208,7 +182,7 @@ const Hero = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.5, duration: 0.5 }}
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+        className="absolute bottom-10 left-0 right-0 flex justify-center"
       >
         <motion.div
           animate={{ y: [0, 10, 0] }}

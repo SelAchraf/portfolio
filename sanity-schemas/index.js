@@ -1,8 +1,7 @@
-// Index file for Sanity schemas
-// Copy this to your Sanity studio schemas/index.js
-
 import project from './project'
-import experience from './experience'
 import profile from './profile'
+import work_experience from './work_experience'
+import certificates from './certificates'
+import skills from './skills'
 
-export const schemaTypes = [project, experience, profile]
+export const schemaTypes = [profile, project, work_experience, certificates, skills]

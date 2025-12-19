@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
-import { FiGithub, FiExternalLink, FiLoader } from 'react-icons/fi'
+import { FiGithub, FiExternalLink, FiLoader, FiFolder } from 'react-icons/fi'
 import { useSanityData } from '../hooks/useSanityData'
 import { fetchProjects, urlFor } from '../lib/sanity'
-import { PortableText } from '@portabletext/react'
+import { useState } from 'react'
 
 const Projects = () => {
   const { data: projects, loading, error } = useSanityData(fetchProjects)
@@ -85,77 +85,137 @@ const Projects = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="section-title text-center">Featured Projects</h2>
+          <h2 className="section-title text-center">Projects</h2>
           <p className="section-subtitle text-center mb-12">
-            Some of the projects I've worked on recently
+            Some of the projects I've worked on
           </p>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {projects.map((project) => (
-            <ProjectCard key={project._id} project={project} itemVariants={itemVariants} />
-          ))}
-        </motion.div>
+        {/* Timeline Container */}
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="relative"
+          >
+            {/* Timeline Line */}
+            <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-0.5 bg-accent-magenta/30 transform md:-translate-x-1/2" />
+            
+            {projects.map((project, index) => (
+              <ProjectCard 
+                key={project._id} 
+                project={project} 
+                itemVariants={itemVariants}
+                index={index}
+              />
+            ))}
+          </motion.div>
+        </div>
       </div>
     </section>
   )
 }
 
-const ProjectCard = ({ project, itemVariants }) => {
-  const imageUrl = project.image ? urlFor(project.image).width(800).height(600).url() : null
+const ProjectCard = ({ project, itemVariants, index }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const imageUrl = project.images && project.images.length > 0 
+    ? urlFor(project.images[currentImageIndex]).width(800).height(600).url() 
+    : null
+  const hasMultipleImages = project.images && project.images.length > 1
+
+  // Alternate sides for desktop
+  const isLeft = index % 2 === 0
 
   return (
     <motion.div
       variants={itemVariants}
-      className="group relative bg-card-bg border border-text-secondary/20 rounded-xl overflow-hidden hover:border-accent-magenta transition-all duration-300"
-      whileHover={{ y: -8 }}
+      className={`relative mb-12 md:mb-16 ${
+        isLeft ? 'md:pr-1/2' : 'md:pl-1/2'
+      }`}
     >
-      {/* Featured Badge */}
-      {project.featured && (
-        <div className="absolute top-4 right-4 z-10">
-          <span className="px-3 py-1 bg-accent-gold/20 text-accent-gold text-xs font-semibold rounded-full border border-accent-gold/30">
-            Featured
-          </span>
-        </div>
-      )}
-
-      {/* Project Image */}
-      <div className="relative h-48 bg-card-bg-hover overflow-hidden">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={project.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-text-muted">
-            <span>No Image</span>
-          </div>
-        )}
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      {/* Timeline Dot */}
+      <div className="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 flex items-center justify-center">
+        <motion.div
+          whileHover={{ scale: 1.2 }}
+          className="w-4 h-4 bg-accent-magenta rounded-full border-4 border-soft-charcoal z-10"
+        />
       </div>
 
-      {/* Project Content */}
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-text-primary mb-3 group-hover:text-accent-magenta transition-colors duration-300">
-          {project.title}
-        </h3>
-
-        {/* Description */}
-        <div className="text-text-muted text-sm mb-4 line-clamp-3 prose-sm prose-invert">
-          {project.description && Array.isArray(project.description) ? (
-            <PortableText value={project.description} />
-          ) : (
-            <p>{project.description || 'No description available'}</p>
+      {/* Project Card */}
+      <div className={`ml-8 md:ml-0 ${
+        isLeft ? 'md:mr-12' : 'md:ml-12'
+      }`}>
+        <motion.div
+          className="group relative bg-card-bg border border-text-secondary/20 rounded-xl overflow-hidden hover:border-accent-magenta transition-all duration-300"
+          whileHover={{ y: -8 }}
+        >
+          {/* Featured Badge */}
+          {project.featured && (
+            <div className="absolute top-4 right-4 z-10">
+              <span className="px-3 py-1 bg-accent-gold/20 text-accent-gold text-xs font-semibold rounded-full border border-accent-gold/30">
+                Featured
+              </span>
+            </div>
           )}
-        </div>
+
+          {/* Category Badge */}
+          {project.category && (
+            <div className="absolute top-4 left-4 z-10">
+              <span className="px-3 py-1 bg-accent-magenta/20 text-accent-magenta text-xs font-semibold rounded-full border border-accent-magenta/30 flex items-center gap-1">
+                <FiFolder className="w-3 h-3" />
+                {project.category}
+              </span>
+            </div>
+          )}
+
+          {/* Project Image with Navigation */}
+          <div className="relative h-48 bg-card-bg-hover overflow-hidden">
+            {imageUrl ? (
+              <>
+                <img
+                  src={imageUrl}
+                  alt={project.title}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                {/* Image Navigation */}
+                {hasMultipleImages && (
+                  <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+                    {project.images.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentImageIndex(idx)}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          idx === currentImageIndex 
+                            ? 'bg-accent-magenta w-6' 
+                            : 'bg-white/50 hover:bg-white/70'
+                        }`}
+                        aria-label={`View image ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-text-muted">
+                <span>No Image</span>
+              </div>
+            )}
+            {/* Overlay on hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </div>
+
+          {/* Project Content */}
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-text-primary mb-3 group-hover:text-accent-magenta transition-colors duration-300">
+              {project.title}
+            </h3>
+
+            {/* Description */}
+            <div className="text-text-muted text-sm mb-4 line-clamp-3">
+              <p>{project.description || 'No description available'}</p>
+            </div>
 
         {/* Tech Stack */}
         {project.techStack && project.techStack.length > 0 && (
@@ -201,8 +261,10 @@ const ProjectCard = ({ project, itemVariants }) => {
             </a>
           )}
         </div>
-      </div>
-    </motion.div>
+        </div>
+      </motion.div>
+    </div>
+  </motion.div>
   )
 }
 

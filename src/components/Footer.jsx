@@ -1,13 +1,49 @@
-import { FiGithub, FiLinkedin, FiTwitter, FiMail } from 'react-icons/fi'
+import { FiGithub, FiLinkedin, FiInstagram, FiFacebook, FiSend } from 'react-icons/fi'
+import { FaTelegram, FaWhatsapp } from 'react-icons/fa'
+import { useSanityData } from '../hooks/useSanityData'
+import { fetchProfile } from '../lib/sanity'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
+  const { data: profileData } = useSanityData(fetchProfile)
 
   const socialLinks = [
-    { icon: FiGithub, href: 'https://github.com/yourusername', label: 'GitHub' },
-    { icon: FiLinkedin, href: 'https://linkedin.com/in/yourusername', label: 'LinkedIn' },
-    { icon: FiTwitter, href: 'https://twitter.com/yourusername', label: 'Twitter' },
-    { icon: FiMail, href: 'mailto:your.email@example.com', label: 'Email' },
+    { 
+      icon: FiGithub, 
+      href: profileData?.socialLinks?.github, 
+      label: 'GitHub',
+      show: !!profileData?.socialLinks?.github
+    },
+    { 
+      icon: FiLinkedin, 
+      href: profileData?.socialLinks?.linkedin, 
+      label: 'LinkedIn',
+      show: !!profileData?.socialLinks?.linkedin
+    },
+    { 
+      icon: FaTelegram, 
+      href: profileData?.socialLinks?.telegram, 
+      label: 'Telegram',
+      show: !!profileData?.socialLinks?.telegram
+    },
+    { 
+      icon: FaWhatsapp, 
+      href: profileData?.socialLinks?.whatsapp, 
+      label: 'WhatsApp',
+      show: !!profileData?.socialLinks?.whatsapp
+    },
+    { 
+      icon: FiInstagram, 
+      href: profileData?.socialLinks?.instagram, 
+      label: 'Instagram',
+      show: !!profileData?.socialLinks?.instagram
+    },
+    { 
+      icon: FiFacebook, 
+      href: profileData?.socialLinks?.facebook, 
+      label: 'Facebook',
+      show: !!profileData?.socialLinks?.facebook
+    },
   ]
 
   return (
@@ -16,7 +52,7 @@ const Footer = () => {
         <div className="flex flex-col items-center space-y-6">
           {/* Social Links */}
           <div className="flex gap-6">
-            {socialLinks.map((link) => (
+            {socialLinks.filter(link => link.show).map((link) => (
               <a
                 key={link.label}
                 href={link.href}
@@ -33,7 +69,7 @@ const Footer = () => {
           {/* Copyright */}
           <div className="text-center">
             <p className="text-text-muted text-sm">
-              © {currentYear} Your Name. All rights reserved.
+              © {currentYear} {profileData?.fullName || 'Your Name'}. All rights reserved.
             </p>
             <p className="text-text-muted text-xs mt-2">
               Built with React, Tailwind CSS, and Framer Motion

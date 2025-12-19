@@ -26,8 +26,14 @@ export default {
         'accent-cream': '#f5f5dc',
         
         // Light Mode (Optional)
-        'light-bg': '#f5f5f5',
+        'light-bg': '#f8f9fa',
+        'light-bg-secondary': '#ffffff',
         'light-card': '#ffffff',
+        'light-section-alt': '#f0f2f5',
+        'light-border': '#e0e3e7',
+        'light-text-primary': '#1a1a1a',
+        'light-text-secondary': '#4a5568',
+        'light-text-muted': '#718096',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

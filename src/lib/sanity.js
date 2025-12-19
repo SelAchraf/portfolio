@@ -42,14 +42,15 @@ export const fetchProjects = async () => {
   
   const query = `*[_type == "project"] | order(featured desc, _createdAt desc) {
     _id,
+    _createdAt,
     title,
-    slug,
+    repoUrl,
+    images,
     description,
-    image,
     techStack,
     demoUrl,
-    repoUrl,
-    featured
+    featured,
+    category
   }`
   
   try {
@@ -57,41 +58,6 @@ export const fetchProjects = async () => {
   } catch (error) {
     console.error('Error fetching projects:', error)
     return []
-  }
-}
-
-// Helper function to fetch about data
-export const fetchAbout = async () => {
-  if (!client) {
-    console.warn('Sanity is not configured. Please add VITE_SANITY_PROJECT_ID and VITE_SANITY_DATASET to your .env file')
-    return null
-  }
-  
-  const query = `*[_type == "about"][0] {
-    _id,
-    name,
-    title,
-    bio,
-    shortBio,
-    image,
-    skills[] {
-      category,
-      items
-    },
-    socialLinks {
-      github,
-      linkedin,
-      twitter,
-      email
-    },
-    resume
-  }`
-  
-  try {
-    return await client.fetch(query)
-  } catch (error) {
-    console.error('Error fetching about data:', error)
-    return null
   }
 }
 
@@ -104,13 +70,19 @@ export const fetchProfile = async () => {
   
   const query = `*[_type == "profile"][0] {
     _id,
-    name,
-    shortBio,
-    resume,
+    fullName,
+    professionalTitle,
+    bio,
+    profileImage,
+    "resumeUrl": resume.asset->url,
     socialLinks {
       github,
       linkedin,
-      twitter
+      telegram,
+      whatsapp,
+      instagram,
+      email,
+      facebook
     }
   }`
   
@@ -122,29 +94,95 @@ export const fetchProfile = async () => {
   }
 }
 
-// Helper function to fetch experience data
-export const fetchExperience = async () => {
+// Helper function to fetch work experience data
+export const fetchWorkExperience = async () => {
   if (!client) {
     console.warn('Sanity is not configured. Please add VITE_SANITY_PROJECT_ID and VITE_SANITY_DATASET to your .env file')
     return []
   }
   
-  const query = `*[_type == "experience"] | order(startDate desc) {
+  const query = `*[_type == "work_experience"] | order(startDate desc) {
     _id,
     company,
     role,
+    location,
     startDate,
     endDate,
     isCurrent,
-    responsibilities
+    description,
+    responsibilities,
+    technologies
   }`
   
   try {
     return await client.fetch(query)
   } catch (error) {
-    console.error('Error fetching experience data:', error)
+    console.error('Error fetching work experience data:', error)
     return []
   }
+}
+
+// Helper function to fetch skills data
+export const fetchSkills = async () => {
+  if (!client) {
+    console.warn('Sanity is not configured. Please add VITE_SANITY_PROJECT_ID and VITE_SANITY_DATASET to your .env file')
+    return []
+  }
+  
+  const query = `*[_type == "skills"] | order(category asc) {
+    _id,
+    name,
+    logo,
+    percentage,
+    category
+  }`
+  
+  try {
+    return await client.fetch(query)
+  } catch (error) {
+    console.error('Error fetching skills data:', error)
+    return []
+  }
+}
+
+// Helper function to fetch certificates data
+export const fetchCertificates = async () => {
+  if (!client) {
+    console.warn('Sanity is not configured. Please add VITE_SANITY_PROJECT_ID and VITE_SANITY_DATASET to your .env file')
+    return []
+  }
+  
+  const query = `*[_type == "certificates"] | order(issueDate desc) {
+    _id,
+    title,
+    issuer,
+    issueDate,
+    expiryDate,
+    credentialUrl,
+    description,
+    image,
+    skills,
+    featured
+  }`
+  
+  try {
+    return await client.fetch(query)
+  } catch (error) {
+    console.error('Error fetching certificates data:', error)
+    return []
+  }
+}
+
+// Helper function to fetch about data (deprecated - use fetchProfile instead)
+export const fetchAbout = async () => {
+  console.warn('fetchAbout is deprecated. Use fetchProfile instead')
+  return await fetchProfile()
+}
+
+// Helper function to fetch experience data (deprecated - use fetchWorkExperience instead)
+export const fetchExperience = async () => {
+  console.warn('fetchExperience is deprecated. Use fetchWorkExperience instead')
+  return await fetchWorkExperience()
 }
 
 // Helper function to fetch blog posts (if needed)

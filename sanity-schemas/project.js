@@ -13,29 +13,28 @@ export default {
       validation: Rule => Rule.required()
     },
     {
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96,
-      },
-      validation: Rule => Rule.required()
+      name: 'repoUrl',
+      title: 'Repository URL',
+      type: 'url'
     },
     {
-      name: 'image',
-      title: 'Image',
-      type: 'image',
-      options: {
-        hotspot: true
-      },
+      name: 'images',
+      title: 'Images',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true
+          }
+        }
+      ],
       validation: Rule => Rule.required()
     },
     {
       name: 'description',
       title: 'Description',
-      type: 'array',
-      of: [{ type: 'block' }],
+      type: 'text',
       validation: Rule => Rule.required()
     },
     {
@@ -51,22 +50,23 @@ export default {
       type: 'url'
     },
     {
-      name: 'repoUrl',
-      title: 'Repository URL',
-      type: 'url'
-    },
-    {
       name: 'featured',
       title: 'Featured',
       type: 'boolean',
       description: 'Highlight this project on the home page',
       initialValue: false
+    },
+    {
+      name: 'category',
+      title: 'Category',
+      type: 'string',
+      description: 'Project category (e.g., Web App, Mobile App, etc.)'
     }
   ],
   preview: {
     select: {
       title: 'title',
-      media: 'image',
+      media: 'images.0',
       featured: 'featured'
     },
     prepare(selection) {

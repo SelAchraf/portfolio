@@ -12,10 +12,11 @@ export default {
     },
     {
       name: 'professionalTitle',
-      title: 'Professional Title',
-      type: 'string',
-      description: 'Your job title (e.g., Full-Stack Developer)',
-      validation: Rule => Rule.required()
+      title: 'Professional Titles',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'Your job titles (e.g., Full-Stack Developer, UI/UX Designer). They will rotate in the hero section.',
+      validation: Rule => Rule.required().min(1)
     },
     {
       name: 'bio',

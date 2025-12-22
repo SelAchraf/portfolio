@@ -2,12 +2,23 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FiLoader, FiCalendar, FiCheckCircle, FiMapPin, FiAward, FiExternalLink, FiBriefcase, FiCode } from 'react-icons/fi'
 import { useSanityMultiData } from '../hooks/useSanityData'
 import { fetchWorkExperience, fetchSkills, fetchCertificates, urlFor } from '../lib/sanity'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const About = () => {
   const { data, loading, error } = useSanityMultiData([fetchWorkExperience, fetchSkills, fetchCertificates])
   const [workExperience, skillsData, certificates] = data
-  const [activeTab, setActiveTab] = useState('skills')
+  const [activeTab, setActiveTab] = useState('experience')
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const tabs = [
     { id: 'skills', label: 'Skills', icon: FiCode, count: skillsData?.length || 0 },
@@ -78,7 +89,7 @@ const About = () => {
   }, {})
 
   return (
-    <section id="about" className="section">
+    <section id="about" className="section overflow-x-hidden">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -121,13 +132,12 @@ const About = () => {
                     <motion.div
                       layoutId="activeTabBg"
                       className="absolute inset-0 bg-gradient-to-r from-accent-magenta via-accent-gold to-accent-magenta bg-[length:200%_100%]"
-                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      transition={{ type: 'tween', duration: 0.6 }}
                       animate={{
                         backgroundPosition: ['0% 0%', '100% 0%', '0% 0%'],
                       }}
                       style={{
                         backgroundSize: '200% 100%',
-                        animation: 'gradient 3s ease infinite',
                       }}
                     />
                   )}
@@ -196,6 +206,7 @@ const About = () => {
               workExperience={workExperience} 
               containerVariants={containerVariants}
               itemVariants={itemVariants}
+              isMobile={isMobile}
             />
           )}
           {activeTab === 'certificates' && (
@@ -279,7 +290,7 @@ const SkillsContent = ({ skillsByCategory, containerVariants, itemVariants }) =>
 }
 
 // Experience Content Component
-const ExperienceContent = ({ workExperience, containerVariants, itemVariants }) => {
+const ExperienceContent = ({ workExperience, containerVariants, itemVariants, isMobile }) => {
   if (!workExperience || workExperience.length === 0) {
     return (
       <motion.div
@@ -304,88 +315,128 @@ const ExperienceContent = ({ workExperience, containerVariants, itemVariants }) 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.4 }}
-      variants={containerVariants}
-      className="max-w-4xl mx-auto"
+      transition={{ type: "tween", duration: 0.4 }}
+      className="max-w-6xl mx-auto relative pb-12"
     >
-      {workExperience.map((exp, index) => (
-        <motion.div
-          key={exp._id}
-          variants={itemVariants}
-          className="relative pl-8 pb-12 last:pb-0"
-        >
-          {/* Timeline line */}
-          {index !== workExperience.length - 1 && (
-            <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-accent-magenta via-accent-gold to-transparent" />
-          )}
+      {/* Center Timeline Line */}
+      <div className="hidden md:block absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-accent-magenta via-accent-gold to-transparent -translate-x-1/2" />
+      
+      {workExperience.map((exp, index) => {
+        const isLeft = index % 2 === 0
+        // Mobile: always from right (50), Desktop: from respective sides
+        const badgeInitialX = isMobile ? 50 : (isLeft ? 80 : -80)
+        const cardInitialX = isMobile ? 50 : (isLeft ? -80 : 80)
+        
+        return (
+          <div
+            key={exp._id}
+            className={`relative pb-12 last:pb-0 md:w-1/2 ${
+              isLeft ? 'md:pr-12 md:ml-0' : 'md:pl-12 md:ml-auto'
+            }`}
+          >
+            {/* Timeline Dot - Static, no animation */}
+            <div 
+              className={`absolute top-2 w-4 h-4 rounded-full bg-accent-magenta border-4 border-bg-primary ring-2 ring-accent-magenta/20 z-10 left-0 ${
+                isLeft 
+                  ? 'md:right-0 md:left-auto md:translate-x-1/2' 
+                  : 'md:left-0 md:-translate-x-1/2'
+              }`}
+            />
 
-          {/* Timeline dot */}
-          <div className="absolute left-0 top-2 w-3 h-3 -translate-x-[5.5px] rounded-full bg-accent-magenta border-4 border-bg-primary" />
+            {/* Mobile Timeline Line */}
+            {index !== workExperience.length - 1 && (
+              <div className="md:hidden absolute left-[7px] top-0 bottom-0 w-px bg-gradient-to-b from-accent-magenta via-accent-gold to-transparent" />
+            )}
 
-          {/* Content */}
-          <div className="bg-card-bg border border-text-secondary/20 rounded-xl p-6 hover:border-accent-magenta transition-all duration-300">
-            <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-              <div>
-                <h4 className="text-xl font-bold text-text-primary mb-1">{exp.role}</h4>
-                <p className="text-accent-gold font-medium">{exp.company}</p>
-                {exp.location && (
-                  <div className="flex items-center gap-2 text-text-muted text-sm mt-1">
-                    <FiMapPin className="w-3 h-3" />
-                    <span>{exp.location}</span>
-                  </div>
+            {/* Date Badge - Animates from its side */}
+            <motion.div 
+              initial={{ opacity: 0, x: badgeInitialX }}
+              whileInView={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: badgeInitialX }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ type: "tween", duration: 0.6, ease: "easeOut" }}
+              className={`ml-8 md:ml-0 md:absolute md:top-0 ${
+                isLeft 
+                  ? 'md:right-[-14rem]' 
+                  : 'md:left-[-15rem]'
+              } mb-4 md:mb-0`}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent-magenta/10 to-accent-gold/10 rounded-lg border border-accent-magenta/20 whitespace-nowrap">
+                <FiCalendar className="w-4 h-4 text-accent-magenta flex-shrink-0" />
+                <span className="text-sm font-semibold text-accent-magenta">
+                  {formatDate(exp.startDate)}
+                </span>
+                <span className="text-xs text-text-muted">→</span>
+                <span className="text-sm font-semibold text-accent-gold">
+                  {exp.isCurrent ? 'Present' : formatDate(exp.endDate)}
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Content Card - Animates from its side */}
+            <motion.div 
+              initial={{ opacity: 0, x: cardInitialX }}
+              whileInView={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: cardInitialX }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ type: "tween", duration: 0.6, ease: "easeOut" }}
+              className={`ml-8 md:ml-0 bg-card-bg border border-text-secondary/20 rounded-xl p-6 hover:border-accent-magenta hover:shadow-lg hover:shadow-accent-magenta/10 transition-all duration-300`}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div className="flex-1">
+                  <h4 className="text-xl font-bold text-text-primary mb-1">{exp.role}</h4>
+                  <p className="text-accent-gold font-medium text-lg">{exp.company}</p>
+                  {exp.location && (
+                    <div className="flex items-center gap-2 text-text-muted text-sm mt-2">
+                      <FiMapPin className="w-4 h-4" />
+                      <span>{exp.location}</span>
+                    </div>
+                  )}
+                </div>
+                {exp.isCurrent && (
+                  <span className="px-4 py-1.5 bg-accent-gold/20 text-accent-gold text-sm font-semibold rounded-full border border-accent-gold/30">
+                    Current
+                  </span>
                 )}
               </div>
-              {exp.isCurrent && (
-                <span className="px-3 py-1 bg-accent-gold/20 text-accent-gold text-sm font-semibold rounded-full border border-accent-gold/30">
-                  Current
-                </span>
+
+              {/* Description */}
+              {exp.description && (
+                <p className="text-text-muted mb-4 leading-relaxed">{exp.description}</p>
               )}
-            </div>
 
-            {/* Date Range */}
-            <div className="flex items-center gap-2 text-text-muted text-sm mb-4">
-              <FiCalendar className="w-4 h-4" />
-              <span>
-                {formatDate(exp.startDate)} - {exp.isCurrent ? 'Present' : formatDate(exp.endDate)}
-              </span>
-            </div>
+              {/* Responsibilities */}
+              {exp.responsibilities && exp.responsibilities.length > 0 && (
+                <div className="mb-4">
+                  <h5 className="text-sm font-semibold text-text-secondary mb-3">Key Responsibilities:</h5>
+                  <ul className="space-y-2">
+                    {exp.responsibilities.map((responsibility, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-text-muted">
+                        <FiCheckCircle className="w-4 h-4 text-accent-magenta mt-0.5 flex-shrink-0" />
+                        <span className="text-sm leading-relaxed">{responsibility}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-            {/* Description */}
-            {exp.description && (
-              <p className="text-text-muted mb-4">{exp.description}</p>
-            )}
-
-            {/* Responsibilities */}
-            {exp.responsibilities && exp.responsibilities.length > 0 && (
-              <div className="mb-4">
-                <h5 className="text-sm font-semibold text-text-secondary mb-2">Key Responsibilities:</h5>
-                <ul className="space-y-2">
-                  {exp.responsibilities.map((responsibility, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-text-muted">
-                      <FiCheckCircle className="w-4 h-4 text-accent-magenta mt-1 flex-shrink-0" />
-                      <span className="text-sm">{responsibility}</span>
-                    </li>
+              {/* Technologies */}
+              {exp.technologies && exp.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-text-secondary/10">
+                  {exp.technologies.map((tech, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1.5 bg-card-bg-hover text-accent-magenta text-xs font-medium rounded-lg border border-accent-magenta/20"
+                    >
+                      {tech}
+                    </span>
                   ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Technologies */}
-            {exp.technologies && exp.technologies.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                {exp.technologies.map((tech, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 bg-card-bg-hover text-text-secondary text-xs rounded-lg border border-text-secondary/20"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            )}
+                </div>
+              )}
+            </motion.div>
           </div>
-        </motion.div>
-      ))}
+        )
+      })}
     </motion.div>
   )
 }

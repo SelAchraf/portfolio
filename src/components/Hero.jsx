@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { FiArrowDown, FiDownload } from 'react-icons/fi'
+import { TypeAnimation } from 'react-type-animation'
 import { useSanityData } from '../hooks/useSanityData'
 import { fetchProfile, urlFor } from '../lib/sanity'
 
@@ -120,13 +121,31 @@ const Hero = () => {
             </span>
           </motion.h1>
 
-          {/* Title */}
-          <motion.h2
+          {/* Title - Typing Effect */}
+          <motion.div
             variants={itemVariants}
-            className="text-3xl md:text-5xl lg:text-6xl font-bold text-text-secondary mb-6"
+            className="text-3xl md:text-5xl lg:text-6xl font-bold text-text-secondary mb-6 min-h-20 md:min-h-24 lg:min-h-28 flex items-center justify-center"
           >
-            {loading ? 'Loading...' : profileData?.professionalTitle || 'Full-Stack Developer'}
-          </motion.h2>
+            <h2>
+              {loading ? (
+                'Loading...'
+              ) : profileData?.professionalTitle && profileData.professionalTitle.length > 0 ? (
+                <TypeAnimation
+                  sequence={profileData.professionalTitle.flatMap(title => [
+                    title,
+                    2000, // Wait 2s before deleting
+                  ])}
+                  wrapper="span"
+                  speed={50}
+                  deletionSpeed={65}
+                  repeat={Infinity}
+                  cursor={true}
+                />
+              ) : (
+                'Full-Stack Developer'
+              )}
+            </h2>
+          </motion.div>
 
           {/* Bio */}
           <motion.p
@@ -141,19 +160,11 @@ const Hero = () => {
           {/* CTA Buttons */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
+            className="flex flex-row gap-4 justify-center items-center mb-12"
           >
             <motion.button
-              onClick={handleScrollToProjects}
-              className="btn-primary w-full sm:w-auto"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              View My Work
-            </motion.button>
-            <motion.button
               onClick={handleScrollToContact}
-              className="btn-secondary w-full sm:w-auto"
+              className="btn-secondary flex-1 sm:flex-initial sm:w-auto"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -165,7 +176,7 @@ const Hero = () => {
                 download
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-outline w-full sm:w-auto flex items-center gap-2"
+                className="btn-outline flex-1 sm:flex-initial sm:w-auto flex items-center gap-2 justify-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >

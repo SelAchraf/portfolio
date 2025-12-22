@@ -71,9 +71,6 @@ const Footer = () => {
             <p className="text-text-muted text-sm">
               © {currentYear} {profileData?.fullName || 'Your Name'}. All rights reserved.
             </p>
-            <p className="text-text-muted text-xs mt-2">
-              Built with React, Tailwind CSS, and Framer Motion
-            </p>
           </div>
         </div>
       </div>

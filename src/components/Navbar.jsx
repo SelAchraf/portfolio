@@ -67,10 +67,7 @@ const Navbar = () => {
   }
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
+    <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
           ? 'bg-deep-black/95 backdrop-blur-md shadow-lg border-b border-text-secondary/10'
@@ -145,33 +142,33 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Menu */}
-      <motion.div
-        initial={false}
-        animate={{
-          height: isMobileMenuOpen ? 'auto' : 0,
-          opacity: isMobileMenuOpen ? 1 : 0,
-        }}
-        transition={{ duration: 0.3 }}
-        className="md:hidden overflow-hidden bg-deep-black/95 backdrop-blur-md border-b border-text-secondary/10"
-      >
-        <div className="container-custom px-4 py-4 space-y-4">
-          {navLinks.map((link) => (
-            <a
-              key={link.id}
-              href={link.href}
-              onClick={(e) => handleNavClick(e, link.href, link.id)}
-              className={`block py-2 px-4 rounded-lg transition-all duration-300 ${
-                activeSection === link.id
-                  ? 'bg-accent-magenta text-white'
-                  : 'text-text-secondary hover:bg-card-bg hover:text-accent-magenta'
-              }`}
-            >
-              {link.name}
-            </a>
-          ))}
-        </div>
-      </motion.div>
-    </motion.nav>
+      {isMobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="md:hidden bg-deep-black/95 backdrop-blur-md border-b border-text-secondary/10"
+        >
+          <div className="container-custom px-4 py-4 space-y-2">
+            {navLinks.map((link) => (
+              <a
+                key={link.id}
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.href, link.id)}
+                className={`block py-3 px-4 rounded-lg transition-all duration-300 ${
+                  activeSection === link.id
+                    ? 'bg-accent-magenta text-white'
+                    : 'text-text-secondary hover:bg-card-bg hover:text-accent-magenta'
+                }`}
+              >
+                {link.name}
+              </a>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </nav>
   )
 }
 

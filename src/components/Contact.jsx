@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { FiMail, FiUser, FiMessageSquare, FiSend } from 'react-icons/fi'
+import { FiMail, FiUser, FiMessageSquare, FiSend, FiEdit3 } from 'react-icons/fi'
 import { useSanityData } from '../hooks/useSanityData'
 import { fetchProfile } from '../lib/sanity'
 import { useState } from 'react'
@@ -160,16 +160,19 @@ const Contact = () => {
               <label htmlFor="subject" className="block text-text-primary font-medium mb-2">
                 Subject
               </label>
-              <input
-                type="text"
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 bg-bg-secondary/50 border border-accent-magenta/30 rounded-lg focus:outline-none focus:border-accent-magenta focus:bg-bg-secondary focus:ring-2 focus:ring-accent-magenta/20 transition-all text-text-primary placeholder:text-text-muted"
-                placeholder="What's this about?"
-              />
+              <div className="relative">
+                <FiEdit3 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent-magenta/70" />
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-4 py-3 bg-bg-secondary/50 border border-accent-magenta/30 rounded-lg focus:outline-none focus:border-accent-magenta focus:bg-bg-secondary focus:ring-2 focus:ring-accent-magenta/20 transition-all text-text-primary placeholder:text-text-muted"
+                  placeholder="What's this about?"
+                />
+              </div>
             </div>
 
             {/* Message Field */}
